@@ -1,0 +1,34 @@
+org: ${env:ORG}
+app: ${env:APP}
+service: ${env:SERVICE}
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: prod
+  region: ap-southeast-2
+  memorySize: 256
+  environment:
+    NODE_ENV: ${env:NODE_ENV}
+    SSM_PATH_SECRET: ${env:SSM_PATH_SECRET}
+    ORG: ${env:ORG}
+    AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE: ${env:AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE}
+
+functions:
+  app:
+    timeout: 28
+    handler: app.handler
+    events:
+      - http: 'ANY /{proxy+}'
+plugins:
+  - serverless-offline
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+  serverless-offline:
+    httpsProtocol: "cert"
+    httpPort: 443
+    noPrependStageInUrl: true

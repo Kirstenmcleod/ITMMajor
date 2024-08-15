@@ -1,0 +1,13 @@
+{
+  "Parameters" : {
+    "Environment" : "prod",
+    "SecureRoles" : "mother-service-role",
+    "Roles" : "mother-service-role"
+  },
+  "Tags" : {
+    "environment" : "prod",
+    "showback" : "mother",
+    "owner" : "kirsten",
+    "product" : "mother"
+  }
+}

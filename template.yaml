@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Type: String
+
+  Roles:
+    Description: Lambda Roles
+    Type: String
+
+  SecureRoles:
+    Description: Lambda Roles
+    Type: String
+
+  MainPrefix:
+    Type: String
+    Default: ''
+
+  LambdaVarGLOBAL:
+    Type: String
+    Default: /mother/
+
+  AppName:
+    Type: String
+    Default: mother
+
+Mappings:
+  prod:
+    apiGateway:
+      logLevel: 'INFO'
+
+# SAM global configs
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    MemorySize: 128
+    Environment:
+      Variables:
+        NODE_ENV: !Sub '${Environment}'
+        SSM_PATH_SECRET: !Sub '${LambdaVarGLOBAL}secure/${Environment}/secrets'
+        AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE: 1
+    
+Resources:
+  # API Gateway
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:  
+      StageName: Live
+      Name: !Sub '${MainPrefix}${AppName}_${Environment}'
+      MethodSettings:
+        - LoggingLevel: !FindInMap [!Ref Environment, apiGateway, logLevel]
+          ResourcePath: '/*'
+          HttpMethod: '*'
+      Auth:
+        ApiKeyRequired: false  #attention!
+
+  # apps
+  app:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures:
+          # NOTE alternate these to match your target CPU Architecture! 
+          # - x86_64
+          - arm64
+      Handler: app.handler
+      FunctionName: !Sub '${MainPrefix}${AppName}-app_${Environment}'
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${SecureRoles}'
+      Timeout: 28
+      Description: Express App      
+      Events:
+        ApiEvent1:
+          Type: Api
+          Properties:
+            Path: '/'
+            Method: GET
+            RestApiId: !Ref ApiGatewayApi
+        ApiEvent2:
+          Type: Api
+          Properties:
+            Path: '{proxy+}'
+            Method: ANY
+            RestApiId: !Ref ApiGatewayApi
