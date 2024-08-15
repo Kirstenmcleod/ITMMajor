@@ -396,7 +396,7 @@ width: 100vw;
 .row {
   display: flex;
   flex-wrap: wrap; /* Allows wrapping of columns */
-  margin: 0 -15px; /* Negative margin to counteract padding */
+  margin: 0px; /* Negative margin to counteract padding */
   background-color: #fff;
 }
 
@@ -568,4 +568,3 @@ width: 100vw;
       margin-right: 20px;
   }
 }
-
