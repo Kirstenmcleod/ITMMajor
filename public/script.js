@@ -240,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
             map,
             position: new google.maps.LatLng(route[0].lat,route[0].lng),
             draggable: false,
+            title: "Shot Location",
             zIndex: 9999,
             collisionBehavior: "OPTIONAL_AND_HIDES_LOWER_PRIORITY"
         });
